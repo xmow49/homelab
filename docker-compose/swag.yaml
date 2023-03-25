@@ -1,0 +1,48 @@
+version: "2"
+services:
+  # swag is a reverse proxy that handles the SSL certificate generation and renewal
+  swag:
+    image: linuxserver/swag
+    container_name: swag
+    cap_add:
+      - NET_ADMIN # for fail2ban --> host iptable 
+    environment:
+      - PUID=33   #change PUID if needed
+      - PGID=33   #change PGID if needed
+      - TZ=Europe/Paris # change Time Zone if needed
+
+      - URL=domain.com
+      - EXTRA_DOMAINS=extra.domain.com
+      - SUBDOMAINS=wildcard
+      - EMAIL=your@email.com
+      - DNSPLUGIN=ovh
+      - VALIDATION=dns
+      - ONLY_SUBDOMAINS=false
+      - STAGING=false
+      - DOCKER_MODS=linuxserver/mods:swag-dbip|linuxserver/mods:swag-dashboard
+
+    volumes:
+      - /mnt/SSD-APP/appdata/swag:/config                                             # change to your config directory
+      - /mnt/SSD-APP/appdata/nextcloud/data/nextcloud.log:/nextcloud/nextcloud.log:ro # change to your nextcloud log directory
+      - /mnt/SSD-APP/appdata/jellyfin/log:/jellyfin/log:ro                            # change to your jellyfin log directory
+      - /mnt/SSD-APP/appdata/authelia/config/authelia.log:/authelia/authelia.log:ro   # change to your authelia log directory
+    ports:
+      - 9091:443  # change to your desired port (443 already in use by trueNAS)
+      - 9090:80   # change to your desired port (80 already in use by trueNAS)
+    restart: unless-stopped
+
+  # authelia is a two-factor authentication server that can be used to protect your applications
+  authelia:
+    image: authelia/authelia:latest
+    container_name: authelia
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Paris
+    volumes:
+      - /mnt/SSD-APP/appdata/authelia/config:/config    # change to your config directory
+      - /mnt/SSD-APP/appdata/authelia/secrets:/secrets  # change to your secrets directory
+
+networks:
+  default:
+    external: true
+    name: docker_network

@@ -1,0 +1,23 @@
+version: "2.1"
+services:
+  syncthing:
+    image: lscr.io/linuxserver/syncthing
+    container_name: syncthing
+    environment:
+      - PUID=1000 # change if needed
+      - PGID=1000 # change if needed
+      - TZ=Europe/Paris
+    volumes:
+      - /mnt/SSD-APP/appdata/syncthing:/config # change to your config directory
+      - /mnt/RAID-WD-2To:/mnt/RAID-WD-2To      # change to your data directory 
+    ports:
+      - 9084:8384       # web gui
+      - 22000:22000/tcp # sync protocol
+      - 22000:22000/udp # sync protocol
+      - 21027:21027/udp # discovery protocol
+    restart: unless-stopped
+
+networks:
+  default:
+    external: true
+    name: docker_network

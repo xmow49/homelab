@@ -1,0 +1,56 @@
+version: "2"
+services:
+  # Nextcloud app container 
+  nextcloud:
+    image: ghcr.io/linuxserver/nextcloud
+    container_name: nextcloud
+    environment:
+      - PUID=1100       #change PUID if needed
+      - PGID=1100       #change PGID if needed
+      - TZ=Europe/Paris #change Time Zone if needed
+    volumes:
+      - /mnt/SSD-APP/appdata/nextcloud/config:/config #change path
+      - /mnt/SSD-APP/appdata/nextcloud/data:/data     #change path
+      - /mnt/RAID-WD-2To/Users:/mnt/RAID-WD-2To/Users #change path
+    depends_on:
+      - mariadb
+    ports:
+      - 10443:443 # temp port for testing
+    restart: unless-stopped
+
+  # MariaDB for Nextcloud
+  mariadb:
+    image: ghcr.io/linuxserver/mariadb
+    container_name: nextclouddb
+    environment:
+      - PUID=0                        #change PUID if needed
+      - PGID=0                        #change PGID if needed
+      - MYSQL_ROOT_PASSWORD=CHANGE_ME #change password
+      - TZ=Europe/Paris               #change Time Zone if needed
+    volumes:
+      - /mnt/SSD-APP/appdata/nextcloud/nextclouddb:/config #change path
+    restart: unless-stopped
+
+  # Collabora Online container for Nextcloud office
+  collabora:
+    image: collabora/code:latest
+    container_name: collabora
+    privileged: true
+    cap_add:
+      - MKNOD
+    environment:
+      - password=CHANGE_ME
+      - username=CHANGE_ME
+      - domain=nextcloud.domain.com
+      - extra_params=--o:ssl.enable=true
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /etc/timezone:/etc/timezone
+    ports:
+      - 9980:9980
+    restart: unless-stopped
+
+networks:
+  default:
+    external: true
+    name: docker_network

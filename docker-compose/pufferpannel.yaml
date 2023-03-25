@@ -1,0 +1,28 @@
+version: "2"
+services:
+  pufferpanel:
+    image: pufferpanel/pufferpanel:latest
+    container_name: pufferpanel
+    environment:
+      - TZ=Europe/Paris # change Time Zone if needed
+    volumes:
+      - /mnt/SSD-APP/appdata/pufferpanel/config:/etc/pufferpanel    # change to your config directory
+      - /mnt/SSD-APP/appdata/pufferpanel/data:/var/lib/pufferpanel  # change to your data directory
+    ports:
+      - 9080:8080 # web interface port
+      - 9057:5657 
+      # - 25565:25565
+    restart: unless-stopped
+    
+  # reverse proxy for minecraft server
+  router:
+    image: itzg/mc-router
+    container_name: router
+    environment:
+      # enable API
+      API_BINDING: ":25564"
+    ports:
+      - 25565:25565
+      # bind the API port to only loopback to avoid external exposure
+      - 127.0.0.1:25564:25564
+    command: --mapping=server1.domain.com=pufferpanel:25567,domain.com=pufferpanel:25566

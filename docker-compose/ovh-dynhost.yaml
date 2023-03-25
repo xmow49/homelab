@@ -1,0 +1,11 @@
+version: "3"
+services:
+  # Dynhost OVH to update IP address of a domain name
+  ovh-dynhost:
+    image: comassky/ovh-dynhost
+    container_name: ovg-dynhost
+    restart: always
+    environment:
+      DYNHOST_DOMAIN_NAME: domain.com
+      DYNHOST_LOGIN: "mylogin@ovh-s"
+      DYNHOST_PASSWORD: "mypassword"

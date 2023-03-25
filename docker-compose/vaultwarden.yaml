@@ -1,0 +1,18 @@
+version: "2"
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: bitwarden
+    volumes:
+      - /mnt/SSD-APP/appdata/vaultwarden:/data/ #change path
+    ports:
+      - 9180:80   #for testing
+      - 9143:443  #for testing
+    environment:
+      - ADMIN_TOKEN=CHANGE_ME #change token
+    restart: unless-stopped
+
+networks:
+  default:
+    external: true
+    name: docker_network

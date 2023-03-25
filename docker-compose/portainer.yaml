@@ -1,0 +1,17 @@
+version: "3"
+services:
+  # Portainer to manage docker containers
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ee
+    restart: always
+    ports:
+      - "9443:9443" # Portainer UI
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /mnt/SSD-APP/appdata/portainer/config:/data # change to your config directory
+    networks:
+      - docker_network
+networks:
+  docker_network:
+    external: true
